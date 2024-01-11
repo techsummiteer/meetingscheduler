@@ -4,7 +4,7 @@ all: build
 
 build:
 	go build
-	./learn1
+	./meetingscheduler
 
 test: 
 	go test -v
