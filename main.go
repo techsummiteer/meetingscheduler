@@ -8,7 +8,7 @@ import (
 )
 
 // Arbitary number ; no assignment takes place based on this
-const MAX_MEETINGS = 999
+const MAX_MEETINGS = 99999
 
 // Type to hold groups of cardinal meetings concatenated in a string
 type CompliantMeetings struct {
@@ -30,7 +30,34 @@ type CompliantMeetings struct {
 // 4. Repeated from 2 until all meetings are scheduled into different slots.
 func main() {
 	// For tests comment out the required meetings variable
-	meetings := [][]string{{"A", "E"}, {"B", "F"}, {"C", "G"}, {"D", "H"}, {"B", "C", "D"}, {"A", "C", "D"}, {"A", "B", "D"}, {"A", "B", "C"}}
+	// meetings := [][]string{
+	// 	{"A0", "B1"}, // Meeting 1: 2 participants
+	// 	{"A0", "B1"}, // Meeting 2: 2 participants
+	// }
+	meetings := [][]string{
+		{"A0", "B1"},                                                                               // Meeting 1: 2 participants
+		{"A1", "B0", "C2"},                                                                         // Meeting 2: 3 participants
+		{"B2", "C1", "E0", "F1"},                                                                   // Meeting 3: 4 participants
+		{"C0", "D1", "F2", "G2", "H1"},                                                             // Meeting 4: 5 participants
+		{"D0", "E1", "G0", "H2", "I1", "J0"},                                                       // Meeting 5: 6 participants
+		{"E2", "F0", "I0", "J1", "A2", "B1", "C2"},                                                 // Meeting 6: 7 participants
+		{"G1", "H0", "I2", "J2", "A0", "B2", "C0", "D2"},                                           // Meeting 7: 8 participants
+		{"A1", "B0", "C1", "D0", "E2", "F1", "G2", "H1", "I0"},                                     // Meeting 8: 9 participants
+		{"J0", "A2", "B1", "C2", "D1", "E0", "F2", "G0", "H2", "I1"},                               // Meeting 9: 10 participants
+		{"J1", "A0", "B2", "C0", "D2", "E1", "F0", "G1", "H0", "I2", "J2"},                         // Meeting 10: 11 participants
+		{"A1", "B0", "C1", "D0", "E2", "F1", "G2", "H1", "I0", "J0", "A2", "B1", "C2"},             // Meeting 11: 13 participants
+		{"D1", "E0", "F2", "G0", "H2", "I1", "J1", "A0", "B2", "C0", "D2", "E1", "F0", "G1", "H0"}, // Meeting 12: 15 participants
+		{"B1", "C2", "D1", "E0", "F0", "G1", "H2", "I2", "J0", "A1"},                               // Meeting 13: 10 participants
+		{"C0", "D2", "E1", "F2", "G0", "H0", "I0", "J1", "A2", "B0", "B2"},                         // Meeting 14: 11 participants
+		{"D0", "E2", "F1", "G2", "H1", "I1", "J2", "A0", "B1", "C1"},                               // Meeting 15: 10 participants
+		{"E0", "F0", "G0", "H0", "I0", "J0", "A1", "B2", "C2", "D1", "E1"},                         // Meeting 16: 11 participants
+		{"F1", "G1", "H1", "I1", "J1", "A2", "B0", "C0", "D2", "E2", "F2"},                         // Meeting 17: 11 participants
+		{"G2", "H2", "I2", "J2", "A0", "B1", "C1", "D0", "E0", "F0", "G0"},                         // Meeting 18: 11 participants
+		{"H1", "I1", "J1", "A1", "B2", "C2", "D1", "E1", "F1", "G1", "H2", "I2", "J2"},             // Meeting 19: 13 participants
+		{"I0", "J0", "A0", "B0", "C0", "D0", "E2", "F2", "G2", "H0", "I1", "J1", "A1", "B1", "C1"}, // Meeting 20: 15 participants
+	}
+
+	//meetings := [][]string{{"A", "E"}, {"B", "F"}, {"C", "G"}, {"D", "H"}, {"B", "C", "D"}, {"A", "C", "D"}, {"A", "B", "D"}, {"A", "B", "C"}}
 	//meetings := [][]string{{"A"}, {"B"}, {"C"}, {"B", "D"}, {"Z"}}
 	//meetings := [][]string{{"A", "B"}, {"B", "C"}, {"C", "D"}, {"D", "E"}}
 	//meetings := [][]string{{"A", "B", "C", "D"}, {"B", "C"}, {"C", "D"}, {"B", "D"}}
@@ -106,14 +133,22 @@ func main() {
 		min_score := MAX_MEETINGS + 1
 		min_meeting := -1
 		for i := 0; i < len(meeting_score); i++ {
-			if meeting_score[i] < min_score {
+			if meeting_score[i] <= min_score {
 				min_score = meeting_score[i]
 				min_meeting = i
-				// Remove the meeting from future selection
-				meeting_score[i] = MAX_MEETINGS * 10
 			}
 		}
+		if -1 != min_meeting {
+			// Remove the meeting from future selection
+			meeting_score[min_meeting] = MAX_MEETINGS * 10
+		} else {
+			fmt.Println("ERROR min_score=", min_score)
+			break
+		}
 		// Fill in the slot.
+		if 0 == uniques[min_meeting].count {
+			continue
+		}
 		slots[slot_idx] = append(slots[slot_idx], uniques[min_meeting].group_of_meetings)
 		slot_idx += 1
 		// Termination condition is that all meetings are scheduled.
