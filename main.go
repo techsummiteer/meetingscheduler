@@ -24,46 +24,59 @@ type CompliantMeetings struct {
 // 2. A 2D array is built for every group in dim1 and the common meetings against every other group in dim2
 //
 // 3. The group in dim1 with the least cumulative common meetings of dim2 is selected for a slot as,
-// this group in dim1 has the largest number of attendees, and its meetings are then
+// this group in dim1 has the largest number of attendees across groups*, and its meetings are then
 // excluded from further consideration. So the next group with a low common overlap is selected.
 //
 // 4. Repeated from 2 until all meetings are scheduled into different slots.
+//
+// * These attendees are attending max number of meetings in cumulative terms
+
 func main() {
 	// For tests comment out the required meetings variable
+	// OR
+	// make test
+	//*********************************************************************************
 	// meetings := [][]string{
-	// 	{"A0", "B1"}, // Meeting 1: 2 participants
-	// 	{"A0", "B1"}, // Meeting 2: 2 participants
+	// 	{"A0", "B1"},
+	// 	{"A0", "B1"},
 	// }
 	meetings := [][]string{
-		{"A0", "B1"},                                                                               // Meeting 1: 2 participants
-		{"A1", "B0", "C2"},                                                                         // Meeting 2: 3 participants
-		{"B2", "C1", "E0", "F1"},                                                                   // Meeting 3: 4 participants
-		{"C0", "D1", "F2", "G2", "H1"},                                                             // Meeting 4: 5 participants
-		{"D0", "E1", "G0", "H2", "I1", "J0"},                                                       // Meeting 5: 6 participants
-		{"E2", "F0", "I0", "J1", "A2", "B1", "C2"},                                                 // Meeting 6: 7 participants
-		{"G1", "H0", "I2", "J2", "A0", "B2", "C0", "D2"},                                           // Meeting 7: 8 participants
-		{"A1", "B0", "C1", "D0", "E2", "F1", "G2", "H1", "I0"},                                     // Meeting 8: 9 participants
-		{"J0", "A2", "B1", "C2", "D1", "E0", "F2", "G0", "H2", "I1"},                               // Meeting 9: 10 participants
-		{"J1", "A0", "B2", "C0", "D2", "E1", "F0", "G1", "H0", "I2", "J2"},                         // Meeting 10: 11 participants
-		{"A1", "B0", "C1", "D0", "E2", "F1", "G2", "H1", "I0", "J0", "A2", "B1", "C2"},             // Meeting 11: 13 participants
-		{"D1", "E0", "F2", "G0", "H2", "I1", "J1", "A0", "B2", "C0", "D2", "E1", "F0", "G1", "H0"}, // Meeting 12: 15 participants
-		{"B1", "C2", "D1", "E0", "F0", "G1", "H2", "I2", "J0", "A1"},                               // Meeting 13: 10 participants
-		{"C0", "D2", "E1", "F2", "G0", "H0", "I0", "J1", "A2", "B0", "B2"},                         // Meeting 14: 11 participants
-		{"D0", "E2", "F1", "G2", "H1", "I1", "J2", "A0", "B1", "C1"},                               // Meeting 15: 10 participants
-		{"E0", "F0", "G0", "H0", "I0", "J0", "A1", "B2", "C2", "D1", "E1"},                         // Meeting 16: 11 participants
-		{"F1", "G1", "H1", "I1", "J1", "A2", "B0", "C0", "D2", "E2", "F2"},                         // Meeting 17: 11 participants
-		{"G2", "H2", "I2", "J2", "A0", "B1", "C1", "D0", "E0", "F0", "G0"},                         // Meeting 18: 11 participants
-		{"H1", "I1", "J1", "A1", "B2", "C2", "D1", "E1", "F1", "G1", "H2", "I2", "J2"},             // Meeting 19: 13 participants
-		{"I0", "J0", "A0", "B0", "C0", "D0", "E2", "F2", "G2", "H0", "I1", "J1", "A1", "B1", "C1"}, // Meeting 20: 15 participants
+		{"A0", "B1"},
+		{"A1", "B0", "C2"},
+		{"B2", "C1", "E0", "F1"},
+		{"C0", "D1", "F2", "G2", "H1"},
+		{"D0", "E1", "G0", "H2", "I1", "J0"},
+		{"E2", "F0", "I0", "J1", "A2", "B1", "C2"},
+		{"G1", "H0", "I2", "J2", "A0", "B2", "C0", "D2"},
+		{"A1", "B0", "C1", "D0", "E2", "F1", "G2", "H1", "I0"},
+		{"J0", "A2", "B1", "C2", "D1", "E0", "F2", "G0", "H2", "I1"},
+		{"J1", "A0", "B2", "C0", "D2", "E1", "F0", "G1", "H0", "I2", "J2"},
+		{"A1", "B0", "C1", "D0", "E2", "F1", "G2", "H1", "I0", "J0", "A2", "B1", "C2"},
+		{"D1", "E0", "F2", "G0", "H2", "I1", "J1", "A0", "B2", "C0", "D2", "E1", "F0", "G1", "H0"},
+		{"B1", "C2", "D1", "E0", "F0", "G1", "H2", "I2", "J0", "A1"},
+		{"C0", "D2", "E1", "F2", "G0", "H0", "I0", "J1", "A2", "B0", "B2"},
+		{"D0", "E2", "F1", "G2", "H1", "I1", "J2", "A0", "B1", "C1"},
+		{"E0", "F0", "G0", "H0", "I0", "J0", "A1", "B2", "C2", "D1", "E1"},
+		{"F1", "G1", "H1", "I1", "J1", "A2", "B0", "C0", "D2", "E2", "F2"},
+		{"G2", "H2", "I2", "J2", "A0", "B1", "C1", "D0", "E0", "F0", "G0"},
+		{"H1", "I1", "J1", "A1", "B2", "C2", "D1", "E1", "F1", "G1", "H2", "I2", "J2"},
+		{"I0", "J0", "A0", "B0", "C0", "D0", "E2", "F2", "G2", "H0", "I1", "J1", "A1", "B1", "C1"},
 	}
-
-	//meetings := [][]string{{"A", "E"}, {"B", "F"}, {"C", "G"}, {"D", "H"}, {"B", "C", "D"}, {"A", "C", "D"}, {"A", "B", "D"}, {"A", "B", "C"}}
+	// meetings := [][]string{{"A", "E"}, {"B", "F"}, {"C", "G"}, {"D", "H"}, {"B", "C", "D"}, {"A", "C", "D"}, {"A", "B", "D"}, {"A", "B", "C"}}
 	//meetings := [][]string{{"A"}, {"B"}, {"C"}, {"B", "D"}, {"Z"}}
 	//meetings := [][]string{{"A", "B"}, {"B", "C"}, {"C", "D"}, {"D", "E"}}
 	//meetings := [][]string{{"A", "B", "C", "D"}, {"B", "C"}, {"C", "D"}, {"B", "D"}}
 	//meetings := [][]string{{"A"}, {"B"}, {"C"}, {"D"}, {"Z"}}
-	var uniques []CompliantMeetings
 	fmt.Println("Num of meetings=", len(meetings))
+	slots, slots_count := schedule(meetings)
+	// Print allocated slots.
+	for i := 0; i < slots_count; i++ {
+		fmt.Printf("Slot[%d]=%v\n", i, slots[i])
+	}
+}
+
+func schedule(meetings [][]string) ([]string, int) {
+	var uniques []CompliantMeetings
 	// Unique meetings with cumulative participants with respect to the current
 	// meeting and stored in a group called uniques
 	for idx1, val1 := range meetings {
@@ -99,7 +112,7 @@ func main() {
 		dependency_matrix[i] = make([]CompliantMeetings, len(uniques))
 	}
 	// The max slots are the number of meetings
-	slots := make([][]string, len(meetings))
+	slots := make([]string, len(meetings))
 	slot_idx := 0
 	// The meeting_score is recorded only once as it gets dirtied with
 	// deletion of slotted meetings in other runs
@@ -149,7 +162,7 @@ func main() {
 		if 0 == uniques[min_meeting].count {
 			continue
 		}
-		slots[slot_idx] = append(slots[slot_idx], uniques[min_meeting].group_of_meetings)
+		slots[slot_idx] = uniques[min_meeting].group_of_meetings
 		slot_idx += 1
 		// Termination condition is that all meetings are scheduled.
 		total_slotted_meetings += get_meeting_count(uniques[min_meeting].group_of_meetings)
@@ -159,10 +172,7 @@ func main() {
 		// Remove the meetings in the slot from the next group to be examined.
 		remove_group_from_uniques(&uniques, uniques[min_meeting].group_of_meetings)
 	}
-	// Print allocated slots.
-	for i := 0; i < slot_idx; i++ {
-		fmt.Printf("Slot[%d]=%s\n", i, slots[i])
-	}
+	return slots, slot_idx
 }
 
 // Returns the meeting count in  the string
